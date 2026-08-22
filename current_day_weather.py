@@ -1,26 +1,26 @@
 import requests
 import json
 import os
+from dotenv import load_dotenv
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
 # Gets Visual Crossing API Key by accessing secret
-def get_api_key(env=False):
-    if env:
-        return os.getenv("API_KEY")
-    return "HVT4UYHERWHZ8722WZNHKZL7Y"
-
+def get_api_key():
+    load_dotenv()
+    return os.getenv("VISUAL_CROSSING_KEY")
+    
 # Calls API and returns response
 def get_day_weather(airport, latitude, longitude):  
     coordinates = f"{latitude},{longitude}" 
-    url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{coordinates}/today"
+    url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{coordinates}/next7days"
     
     api_key = get_api_key()
     params = {
         "locationNames" : airport,
         "unitGroup" : "metric",
-        "elements" : "add:aqieur,add:latitude,add:longitude,add:elevation,add:precipremote,add:resolvedAddress,add:timezone,add:tzoffset,add:windspeedmax,add:windspeedmin,remove:moonphase",
-        "include" : "days,hours,current,alerts,event",
+        "elements" : "add:elevation,add:hailrisk,add:latitude,add:lightningrisk,add:longitude,add:resolvedAddress,add:windspeedmax,add:windspeedmean,add:windspeedmin,remove:moonphase,remove:sunrise,remove:sunset",
+        "include" : "days,current,alerts,hours",
         "key" : api_key,
         "contentType" : "json"
     }
