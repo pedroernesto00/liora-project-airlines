@@ -8,7 +8,7 @@ def get_api_key():
     load_dotenv()
     return os.getenv("RAPID_API_KEY")
 
-def get_airport_runways(airport_iata):
+def get_airport_arrivals_departures(airport_iata):
     api_key = get_api_key()
     headers = {
         "x-rapidapi-host" : "aerodatabox.p.rapidapi.com",
@@ -16,7 +16,14 @@ def get_airport_runways(airport_iata):
         "Content-Type": "application/json"
     }
 
-    url = f"https://aerodatabox.p.rapidapi.com/airports/iata/{airport_iata}/runways"
+    params = {"offsetMinutes":"-60",
+              "durationMinutes":"120",
+              "direction":"Both",
+              "withCancelled":"true",
+              "withCodeshared":"true",
+              "withLocation":"false"}
+
+    url = f"https://aerodatabox.p.rapidapi.com/flights/airports/iata/{airport_iata}"
 
     response = requests.get(url, headers=headers) 
     response.raise_for_status()
@@ -24,5 +31,5 @@ def get_airport_runways(airport_iata):
     return response.json() 
 
 if __name__ == "__main__":
-    data = get_airport_runways("CDG")
+    data = get_airport_arrivals_departures("CDG")
     print(json.dumps(data, indent=2))
