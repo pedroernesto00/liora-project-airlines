@@ -16,6 +16,8 @@ class WeatherBronze:
         records = []
         for airport, weather_data_list in data.items():
             for date, weather_data in weather_data_list:
+                if weather_data == None:
+                    continue
                 record = {
                     "airport": airport,
                     "date": date.isoformat(),
