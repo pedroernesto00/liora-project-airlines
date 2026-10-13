@@ -3,6 +3,8 @@ from ref.airports import AirportReference
 from api.weather import WeatherAPI
 import pandas as pd
 import sys
+import json
+import time
 from datetime import datetime, timedelta, date
 #from dateutil.relativedelta import relativedelta
 
@@ -25,24 +27,24 @@ def get_weather():
     max_date = '2024-12-31' if last_recovered_date == None else last_recovered_date
     begin_date = datetime.strptime(max_date, "%Y-%m-%d").date() + timedelta(days=1)
     current_date = begin_date
-    end_date = current_date + timedelta(days=0)
+    end_date = current_date + timedelta(days=49)
 
     err = None
     while current_date <= end_date:
         print(current_date, file=sys.stderr)
+        time.sleep(1)
         for airport_id, latitude, longitude in airport_coordinates.values:
             print(airport_id, file=sys.stderr)
             try: 
                 airport_day_weather = weather_api.get_day_weather(airport_id, latitude, longitude, current_date)
-                print((current_date, airport_day_weather))
-                airports_weather_dict[airport_id].append((current_date, airport_day_weather))
+                airports_weather_dict[airport_id].append((current_date.isoformat(), airport_day_weather))
             except RuntimeError as error:
                 err = error
                 print(f"Fatal Error: {error}", file=sys.stderr)
                 current_date = end_date
                 break
         current_date += timedelta(days=1)
-
+    print(json.dumps(airports_weather_dict))
     if err:
         return
     
