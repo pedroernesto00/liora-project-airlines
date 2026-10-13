@@ -20,7 +20,7 @@ class WeatherBronze:
                     continue
                 record = {
                     "airport": airport,
-                    "date": date.isoformat(),
+                    "date": date,
                     "elevation": weather_data.get("elevation"),
                     "days": weather_data.get("days"),
                     "stations": weather_data.get("stations")
