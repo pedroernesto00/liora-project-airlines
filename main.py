@@ -8,7 +8,6 @@ import sys
 import json
 import time
 from datetime import datetime, timedelta, date
-#from dateutil.relativedelta import relativedelta
 
 def get_airports():
     airports_ref = AirportReference()
@@ -46,6 +45,7 @@ def get_weather():
                 current_date = end_date
                 break
         current_date += timedelta(days=1)
+
     print(json.dumps(airports_weather_dict))
     if err:
         return
@@ -61,6 +61,7 @@ def get_flights(movement):
     airports_df = get_airports()
     airport_coordinates = airports_df[["iata", "icao"]]
     airport_flights_dict = {airport : [] for airport in airport_coordinates["iata"].values}
+
     last_recovered_date = flights_bronze.get_last_recovery_date()
     max_date = '2024-12-31' if last_recovered_date == None else last_recovered_date
     begin_date = datetime.strptime(max_date, "%Y-%m-%d").date() + timedelta(days=1)
@@ -74,8 +75,7 @@ def get_flights(movement):
             print(airport_id, file=sys.stderr)
             try: 
                 airport_departures = flights_api.airport_flights(icao, current_date, movement[:-1])
-                print((current_date, airport_departures))
-                airport_flights_dict[airport_id].append((current_date, airport_departures))
+                airport_flights_dict[airport_id].append((current_date.isoformat(), airport_departures))
             except RuntimeError as error:
                 err = error
                 print(f"Fatal Error: {error}", file=sys.stderr)
@@ -83,6 +83,7 @@ def get_flights(movement):
                 break
         current_date += timedelta(days=1)
 
+    print(json.dumps(airport_flights_dict))
     if err:
         return
     
