@@ -25,9 +25,8 @@ class FlightsAPI:
             return []
 
         if response.status_code == 429:
-            print("Remaining credits:", response.headers.get("X-Rate-Limit-Remaining"))
             raise RuntimeError("Limit reached, see you tomorrow!")
-
+        print("Remaining credits:", response.headers.get("X-Rate-Limit-Remaining"))
         response.raise_for_status()
         
         return response.json()

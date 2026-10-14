@@ -66,12 +66,12 @@ def get_flights(movement):
     max_date = '2024-12-31' if last_recovered_date == None else last_recovered_date
     begin_date = datetime.strptime(max_date, "%Y-%m-%d").date() + timedelta(days=1)
     current_date = begin_date
-    end_date = current_date + timedelta(days=0)
+    end_date = current_date + timedelta(days=5)
 
     err = None
     while current_date <= end_date:
         print(current_date, file=sys.stderr)
-        for airport_id, icao in airport_coordinates.values[:1]:
+        for airport_id, icao in airport_coordinates.values:
             print(airport_id, file=sys.stderr)
             try: 
                 airport_departures = flights_api.airport_flights(icao, current_date, movement[:-1])
@@ -94,3 +94,4 @@ def get_flights(movement):
 if __name__ == "__main__":
     #get_weather()
     get_flights("departures")
+    get_flights("arrivals")

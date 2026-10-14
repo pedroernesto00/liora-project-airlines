@@ -23,7 +23,7 @@ class FlightsBronze:
                     continue
                 record = {
                     "airport": airport,
-                    "date": date.isoformat(),
+                    "date": date,
                     "flights" : flights_data
                 }
                 records.append(record)
