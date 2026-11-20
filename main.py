@@ -1,4 +1,5 @@
 from bronze.weather import WeatherBronze
+from silver.weather import WeatherSilver
 from ref.airports import AirportReference
 from api.weather import WeatherAPI
 import pandas as pd
@@ -6,7 +7,7 @@ import sys
 import json
 import time
 from datetime import datetime, timedelta, date
-#from dateutil.relativedelta import relativedelta
+
 
 def get_airports():
     airports_ref = AirportReference()
@@ -18,7 +19,6 @@ def get_weather():
     weather_api = WeatherAPI()
     weather_bronze = WeatherBronze()
 
-
     airports_df = get_airports()
     airport_coordinates = airports_df[["iata", "latitude", "longitude"]]
     airports_weather_dict = {airport : [] for airport in airport_coordinates["iata"].values}
@@ -27,10 +27,11 @@ def get_weather():
     max_date = '2024-12-31' if last_recovered_date == None else last_recovered_date
     begin_date = datetime.strptime(max_date, "%Y-%m-%d").date() + timedelta(days=1)
     current_date = begin_date
-    end_date = current_date + timedelta(days=49)
+    end_date = current_date + timedelta(days=14)
+    today = date.today() + timedelta(days=-1)
 
     err = None
-    while current_date <= end_date:
+    while current_date <= min(end_date, today):
         print(current_date, file=sys.stderr)
         time.sleep(1)
         for airport_id, latitude, longitude in airport_coordinates.values:
@@ -44,13 +45,16 @@ def get_weather():
                 current_date = end_date
                 break
         current_date += timedelta(days=1)
-    print(json.dumps(airports_weather_dict))
     if err:
         return
     
     weather_bronze.save(airports_weather_dict) 
 
-    return airports_weather_dict
+    return begin_date
+
 
 if __name__ == "__main__":
-    get_weather()
+    begin_date = get_weather()
+
+    weather_silver = WeatherSilver()
+    weather_silver.save_all_from_bronze(begin_date)
