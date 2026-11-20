@@ -31,6 +31,17 @@ class ConnectSupabase:
 
         return response.data
 
+    def insert_ignore_duplicates(self, schema: str, table: str, data: list[dict], on_conflict: str):
+        response = (
+                    self.client
+                    .schema(schema)
+                    .table(table)
+                    .upsert(data, on_conflict=on_conflict, ignore_duplicates=True)
+                    .execute()
+                )
+        
+        return response.data
+
     def select(self, schema: str, table: str, columns: str = "*"):
         response = (
             self.client
